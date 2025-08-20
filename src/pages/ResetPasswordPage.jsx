@@ -41,16 +41,49 @@ const ResetPasswordPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check initial session and listen for auth events
-    const checkSessionAndListen = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        setIsRecoveryMode(true); // User is logged in via reset link
+    const init = async () => {
+      // Grab tokens from URL hash
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const access_token = hashParams.get("access_token");
+      const refresh_token = hashParams.get("refresh_token");
+      const type = hashParams.get("type");
+
+      console.log("Access token: ", access_token);
+      console.log("Refresh token: ", refresh_token);
+      console.log("Type: ", type);
+
+      if (access_token && refresh_token && type === "recovery") {
+        // Manually set session (important for mobile/in-app browsers)
+        const { data, error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+
+        if (error) {
+          console.error("Error setting session:", error);
+        } else {
+          setIsRecoveryMode(true);
+        }
+        // Clear hash from URL after processing (optional, cleaner URL)
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+      } else {
+        // Fallback: check if session already exists
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          setIsRecoveryMode(true);
+        }
       }
+
       setCheckingSession(false);
 
+      // Listen for Supabase auth events
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((event) => {
@@ -70,7 +103,7 @@ const ResetPasswordPage = () => {
       return () => subscription.unsubscribe();
     };
 
-    checkSessionAndListen();
+    init();
   }, [navigate, toast]);
 
   const handleSubmit = async (e) => {
