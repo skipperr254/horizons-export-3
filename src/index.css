@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 99%;
+    --foreground: 240 10% 3.9%;
+    --card: 240 10% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 240 10% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 3.9%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 10% 3.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262.1 83.3% 57.8%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 4% 65%;
+    --accent: 240 4% 12%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 12%;
+    --input: 240 4% 12%;
+    --ring: 262.1 83.3% 57.8%;
+  }
+
+  .sepia-mode {
+    --background: 39 50% 96%;
+    --foreground: 39 20% 30%;
+    --card: 39 50% 96%;
+    --card-foreground: 39 20% 30%;
+    --popover: 39 50% 96%;
+    --popover-foreground: 39 20% 30%;
+    --primary: 25 50% 50%;
+    --primary-foreground: 39 50% 98%;
+    --secondary: 39 40% 92%;
+    --secondary-foreground: 39 20% 30%;
+    --muted: 39 40% 92%;
+    --muted-foreground: 39 20% 45%;
+    --accent: 39 40% 92%;
+    --accent-foreground: 39 20% 30%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 39 50% 98%;
+    --border: 39 30% 85%;
+    --input: 39 30% 85%;
+    --ring: 25 50% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+}
+
+@layer components {
+  .story-content-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  .sepia-mode .story-content-container {
+    text-shadow: 0 0 1px hsl(var(--foreground) / 0.2);
+  }
+  .story-content-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  .story-content-container::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .story-content-container::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  .story-content-container:hover::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border border-white/20 dark:border-gray-700/20 shadow-xl;
+  }
+
+  .glass-box {
+    @apply bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg border border-white/20 dark:border-slate-700/20 rounded-2xl shadow-lg;
+  }
+  
+  .btn-glow {
+    @apply relative overflow-hidden;
+  }
+  
+  .btn-glow::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-300;
+  }
+  
+  .btn-glow:hover::before {
+    @apply opacity-20;
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .level-badge {
+    @apply px-2.5 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wide border;
+  }
+  
+  .level-a1 {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 border-blue-200 dark:border-blue-700;
+  }
+  
+  .level-a2 {
+    @apply bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 border-green-200 dark:border-green-700;
+  }
+  
+  .level-b1 {
+    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700;
+  }
+  
+  .level-b2 {
+    @apply bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200 border-orange-200 dark:border-orange-700;
+  }
+  
+  .level-c1 {
+    @apply bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-700;
+  }
+  
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .word-token {
+    @apply inline-block transition-all duration-200 ease-in-out cursor-pointer;
+    padding: 1px 2px;
+    margin: 0;
+    border-radius: 3px;
+    line-height: 1.6;
+  }
+
+  .word-token:hover {
+    @apply bg-primary/10;
+  }
+
+  .selected-word {
+    @apply bg-green-400/30 dark:bg-green-500/30;
+  }
+
+  .reading-highlight {
+    @apply bg-primary/30 dark:bg-primary/40 rounded-sm transition-all duration-100;
+    z-index: 10;
+    position: relative;
+  }
+  
+  .marked-word-highlight {
+    text-decoration: underline;
+    text-decoration-color: hsl(var(--primary));
+    text-decoration-style: wavy;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    background-color: hsl(var(--primary) / 0.2);
+    border-radius: 3px;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  .animated-gradient-text {
+    background-size: 300% auto;
+    animation: text-gradient-animation 15s ease-in-out infinite alternate;
+  }
+  
+  @keyframes text-gradient-animation {
+    from {
+      background-position: 0% center;
+    }
+    to {
+      background-position: 100% center;
+    }
+  }
+
+  .font-story {
+    font-family: 'Lora', serif;
+  }
+
+  .cta-glow-button {
+    @apply relative inline-flex items-center justify-center overflow-hidden
+           bg-gradient-to-r from-primary via-purple-500 to-pink-500 text-primary-foreground
+           shadow-lg shadow-primary/20 hover:shadow-2xl hover:shadow-primary/40
+           transition-all duration-300 ease-in-out
+           transform hover:-translate-y-px hover:scale-105;
+  }
+
+  .cta-glow-button::after {
+    content: '';
+    @apply absolute top-0 left-[-150%] w-[100%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent
+           transition-transform duration-700 ease-in-out;
+    transform: skewX(-25deg);
+  }
+
+  .cta-glow-button:hover::after {
+    transform: translateX(250%) skewX(-25deg);
+  }
+
+  .hero-cta-button {
+    @apply bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90
+           transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out;
+  }
+
+  .hero-cta-glow {
+    @apply relative overflow-visible;
+  }
+
+  .hero-cta-glow::before {
+    content: '';
+    @apply absolute -inset-2.5 rounded-full bg-primary opacity-0 blur-xl transition-opacity duration-500;
+    z-index: -1;
+  }
+
+  .hero-cta-glow:hover::before {
+    @apply opacity-30;
+  }
+
+  .hero-secondary-button {
+    @apply bg-white/50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-700 
+           text-slate-700 dark:text-slate-200 backdrop-blur-sm
+           hover:bg-white/80 dark:hover:bg-slate-800/80 hover:border-primary/50 dark:hover:border-primary/50
+           transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out;
+  }
+
+  .category-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+  .category-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .category-scroll::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  .category-scroll:hover::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-secondary/30;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
