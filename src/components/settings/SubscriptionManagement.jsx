@@ -52,33 +52,68 @@ const SubscriptionManagement = () => {
     };
   }, [user]);
 
+  const getSimplifiedErrorMessage = (error) => {
+    const message = error.message || "";
+    if (
+      message.includes("signature does not match") ||
+      message.toLowerCase().includes("imza hatası")
+    ) {
+      return "Ödeme başlatılamadı (imza hatası). Lütfen daha sonra tekrar deneyin.";
+    }
+    if (
+      message.includes("11") ||
+      message.toLowerCase().includes("geçersiz istek")
+    ) {
+      return "Geçersiz bir istek gönderildi. Lütfen girdiğiniz bilgileri kontrol edip tekrar deneyin.";
+    }
+    if (message.includes("Failed to fetch")) {
+      return "Ödeme servisine ulaşılamadı. Lütfen internet bağlantınızı kontrol edin.";
+    }
+    return `Abonelik başlatılamadı. Hata: ${message}`;
+  };
+
   const handleReactivateSubscription = async () => {
     setIsReactivating(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "iyzico-payment",
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error("Sesión de autenticación no encontrada."); // Authentication session not found
+
+      const response = await fetch(
+        "https://vjxkmufoztgzrnwaxswo.supabase.co/functions/v1/iyzico-resubscribe",
         {
-          body: { action: "reactivate_subscription" },
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
         }
       );
 
-      if (error) throw new Error(error.message);
-      if (data.error) throw new Error(data.error);
+      const result = await response.json();
 
-      await refreshUserProfile();
-      toast({
-        title: "Aboneliğiniz Yeniden Aktif! 🎉",
-        description: "Premium özelliklerinize tekrar erişebilirsiniz.",
-        className:
-          "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-300",
-      });
+      if (!response.ok) {
+        throw new Error(result.error || "Bilinmeyen bir hata oluştu.");
+      }
+
+      if (result.checkoutFormContent) {
+        navigate("/subscription/iyzico-checkout", {
+          state: { checkoutFormContent: result.checkoutFormContent },
+        });
+      } else if (result.paymentPageUrl) {
+        window.location.href = result.paymentPageUrl;
+      } else {
+        throw new Error(
+          "Iyzico'dan geçersiz yanıt alındı veya form içeriği boş."
+        );
+      }
     } catch (error) {
+      console.error("Subscription initialization failed:", error);
       toast({
-        title: "Hata",
-        description:
-          "Abonelik yeniden etkinleştirilirken bir sorun oluştu: " +
-          error.message,
         variant: "destructive",
+        title: "Bir hata oluştu!",
+        description: error,
       });
     } finally {
       setIsReactivating(false);
@@ -113,11 +148,11 @@ const SubscriptionManagement = () => {
       });
       setIsCancelling(false);
     } catch (error) {
+      console.error("Subscription initialization failed:", error);
       toast({
-        title: "Hata",
-        description:
-          "Abonelik iptal edilirken bir sorun oluştu: " + error.message,
         variant: "destructive",
+        title: "Bir hata oluştu!",
+        description: getSimplifiedErrorMessage(error),
       });
     } finally {
       setIsProcessing(false);
