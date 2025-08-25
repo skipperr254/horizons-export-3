@@ -92,8 +92,9 @@ const SubscriptionManagement = () => {
 
       const result = await response.json();
 
-      if (!result.ok) {
-        throw new Error(error || "Bilinmeyen bir hata oluştu."); // here is where we are deciding whether it's just throwing an error or a new Error with that error
+      if (!response.ok) {
+        console.log("Result: ", result);
+        throw new Error(result.error || "Bilinmeyen bir hata oluştu."); // here is where we are deciding whether it's just throwing an error or a new Error with that error
       }
 
       if (result.checkoutFormContent) {
