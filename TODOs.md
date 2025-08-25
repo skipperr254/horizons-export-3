@@ -6,3 +6,7 @@
 - [ ] In cancel payment, update the reason and dates and so on
 - [ ] In callback, update payment date and next payment date and customer id
       Go back to my initial resubscription process. It was working just fine.
+      Remember when someone cancels a subscription, also set the subscription reference code to null
+
+Get subscription date in the database from the fethed createdDate
+Start and end date from the latest adding to the orders startPeriod and endPeriod

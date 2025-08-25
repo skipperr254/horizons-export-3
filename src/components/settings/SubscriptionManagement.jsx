@@ -85,7 +85,6 @@ const SubscriptionManagement = () => {
         {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
         }
@@ -93,8 +92,8 @@ const SubscriptionManagement = () => {
 
       const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || "Bilinmeyen bir hata oluştu.");
+      if (!result.ok) {
+        throw new Error(error || "Bilinmeyen bir hata oluştu."); // here is where we are deciding whether it's just throwing an error or a new Error with that error
       }
 
       if (result.checkoutFormContent) {
@@ -148,7 +147,7 @@ const SubscriptionManagement = () => {
       });
       setIsCancelling(false);
     } catch (error) {
-      console.error("Subscription initialization failed:", error);
+      console.error("Subscription re-initialization failed:", error);
       toast({
         variant: "destructive",
         title: "Bir hata oluştu!",
