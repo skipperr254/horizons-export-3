@@ -11,8 +11,8 @@ const SubscriptionDetails = ({ profile, nextPaymentDate }) => {
         <div>
           <p className='text-sm font-medium'>Başlangıç Tarihi</p>
           <p className='text-xs text-muted-foreground'>
-            {profile?.subscription_date
-              ? new Date(profile.subscription_date).toLocaleDateString(
+            {profile?.last_payment_date
+              ? new Date(profile.last_payment_date).toLocaleDateString(
                   "tr-TR",
                   { year: "numeric", month: "long", day: "numeric" }
                 )

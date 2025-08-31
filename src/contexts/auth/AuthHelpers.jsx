@@ -51,6 +51,7 @@ export const loadUserProfile = async (authUser, setUser, preserveUser) => {
         cancellation_date: profile.cancellation_date,
         subscription_status: profile.subscription_status,
         next_payment_date: profile.next_payment_date, // Added
+        last_payment_date: profile.last_payment_date, // Added
         trial_start_date: profile.trial_start_date,
         trial_end_date: profile.trial_end_date,
         preferences: profile.preferences,
@@ -149,6 +150,7 @@ export const createUserProfile = async (authUser, setUser) => {
         subscription_date: profile.subscription_date,
         cancellation_date: profile.cancellation_date,
         next_payment_date: profile.next_payment_date, // Newly added
+        last_payment_date: profile.last_payment_date, // Newly added
         avatar_url: profile.avatar_url,
         subscription_status: profile.subscription_status,
         trial_start_date: profile.trial_start_date,
