@@ -1,17 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/customSupabaseClient";
 import { Upload, X, Loader2 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import imageCompression from "browser-image-compression";
-// import Compressor from "compressorjs";
 
 const ImageUpload = ({ storyForm, setStoryForm }) => {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
+  const cloudName = "dtg5wftym";
+  const uploadPreset = "hikayego-uploads";
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
@@ -45,23 +44,30 @@ const ImageUpload = ({ storyForm, setStoryForm }) => {
         .toString(36)
         .substring(2)}.${fileExt}`;
 
-      // Compress the image
-      const options = {
-        maxSizeMB: 0.1,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
-        fileType: "image/jpeg",
-      };
-      const compressedFile = await imageCompression(file, options);
+      // Upload to Cloudinary
+      const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+      const fd = new FormData();
+      fd.append("upload_preset", uploadPreset);
+      fd.append("tags", "browser_upload"); // Optional - add tags for image admin in Cloudinary
+      fd.append("file", file);
 
-      // console.log("Original file size:", file.size / 1024, "KB");
-      // const compressedFile = await imageCompression(file, options);
-      // console.log("Compressed file size:", compressedFile.size / 1024, "KB");
+      const response = await fetch(url, {
+        method: "POST",
+        body: fd,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const cloudinaryData = await response.json();
+      console.log("Cloudinary response: ", cloudinaryData);
+      // continue from here
 
       // Upload to Supabase Storage
-      const { error } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from("story_images")
-        .upload(fileName, compressedFile, {
+        .upload(fileName, file, {
           cacheControl: "3600",
           upsert: false,
         });
@@ -76,6 +82,7 @@ const ImageUpload = ({ storyForm, setStoryForm }) => {
         return;
       }
 
+      // LETS MOVE IMAGE PROCESSING TO THE FRONTEND
       // Get public URL
       const {
         data: { publicUrl },
@@ -95,7 +102,7 @@ const ImageUpload = ({ storyForm, setStoryForm }) => {
       console.error("Upload error:", error);
       toast({
         title: "Hata",
-        description: `Resim yüklenirken bir hata oluştu: ${error.message}`,
+        description: "Resim yüklenirken bir hata oluştu.",
         variant: "destructive",
       });
     } finally {
@@ -127,63 +134,43 @@ const ImageUpload = ({ storyForm, setStoryForm }) => {
     <div>
       <Label htmlFor='story-image'>Hikaye Resmi</Label>
       <div className='space-y-2'>
-        <AnimatePresence mode='wait'>
-          {storyForm.image_url ? (
-            <motion.div
-              key='image-preview'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className='relative'
+        {storyForm.image_url ? (
+          <div className='relative'>
+            <img
+              src={storyForm.image_url}
+              alt='Hikaye resmi'
+              className='w-full h-32 object-cover rounded-md border'
+            />
+            <Button
+              type='button'
+              variant='destructive'
+              size='sm'
+              className='absolute top-2 right-2'
+              onClick={handleRemoveImage}
             >
-              <img
-                src={storyForm.image_url}
-                alt='Hikaye resmi'
-                className='w-full h-32 object-cover rounded-md border'
-              />
-              <Button
-                type='button'
-                variant='destructive'
-                size='sm'
-                className='absolute top-2 right-2'
-                onClick={handleRemoveImage}
-              >
-                <X className='h-3 w-3' />
-              </Button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key='upload-ui'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className='border-2 border-dashed border-muted-foreground/25 rounded-md p-4 text-center'
-            >
-              <Upload className='h-8 w-8 mx-auto mb-2 text-muted-foreground' />
-              <p className='text-sm text-muted-foreground mb-2'>
-                Resim yüklemek için tıklayın
-              </p>
-              <Input
-                type='file'
-                accept='image/*'
-                onChange={handleImageUpload}
-                disabled={uploading}
-                className='cursor-pointer'
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <X className='h-3 w-3' />
+            </Button>
+          </div>
+        ) : (
+          <div className='border-2 border-dashed border-muted-foreground/25 rounded-md p-4 text-center'>
+            <Upload className='h-8 w-8 mx-auto mb-2 text-muted-foreground' />
+            <p className='text-sm text-muted-foreground mb-2'>
+              Resim yüklemek için tıklayın
+            </p>
+            <Input
+              type='file'
+              accept='image/*'
+              onChange={handleImageUpload}
+              disabled={uploading}
+              className='cursor-pointer'
+            />
+          </div>
+        )}
         {uploading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className='flex items-center justify-center py-2'
-          >
+          <div className='flex items-center justify-center py-2'>
             <Loader2 className='h-4 w-4 animate-spin mr-2' />
             <span className='text-sm'>Yükleniyor...</span>
-          </motion.div>
+          </div>
         )}
       </div>
       <p className='text-xs text-muted-foreground mt-1'>

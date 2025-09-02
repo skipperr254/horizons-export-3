@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/customSupabaseClient';
+import { useState, useCallback } from "react";
+import { supabase } from "@/lib/customSupabaseClient";
 
 export const useAdminActions = ({
   users,
@@ -13,35 +13,58 @@ export const useAdminActions = ({
   categories,
   setCategories,
   refetch,
-  toast
+  toast,
 }) => {
   const [updatingUser, setUpdatingUser] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [storyForm, setStoryForm] = useState({ title: '', description: '', level: 'a1', category: 'adventure', read_time: '5 dk', image_url: '', content: '' });
+  const [storyForm, setStoryForm] = useState({
+    title: "",
+    description: "",
+    level: "a1",
+    category: "adventure",
+    read_time: "5 dk",
+    image_url: "",
+    content: "",
+  });
   const [editingStory, setEditingStory] = useState(null);
-  const [testimonialForm, setTestimonialForm] = useState({ name: '', comment: '' });
+  const [testimonialForm, setTestimonialForm] = useState({
+    name: "",
+    comment: "",
+  });
   const [isProcessingTestimonial, setIsProcessingTestimonial] = useState(false);
 
   const handleTogglePremium = async (userId, currentStatus) => {
     setUpdatingUser(userId);
     try {
-      const { data, error } = await supabase.rpc('manage_user_premium', {
+      const { data, error } = await supabase.rpc("manage_user_premium", {
         p_user_id: userId,
-        p_premium_status: !currentStatus
+        p_premium_status: !currentStatus,
       });
 
       if (error) throw error;
 
-      setUsers(users.map(u => u.id === userId ? { ...u, subscription: !currentStatus, subscription_status: data.subscription_status } : u));
+      setUsers(
+        users.map((u) =>
+          u.id === userId
+            ? {
+                ...u,
+                subscription: !currentStatus,
+                subscription_status: data.subscription_status,
+              }
+            : u
+        )
+      );
       toast({
-        title: 'Başarılı!',
-        description: `Kullanıcının premium durumu güncellendi. Yeni durum: ${!currentStatus ? 'Aktif' : 'İptal Edildi'}.`,
+        title: "Başarılı!",
+        description: `Kullanıcının premium durumu güncellendi. Yeni durum: ${
+          !currentStatus ? "Aktif" : "İptal Edildi"
+        }.`,
       });
     } catch (error) {
       toast({
-        title: 'Hata',
-        description: 'Kullanıcı durumu güncellenemedi: ' + error.message,
-        variant: 'destructive',
+        title: "Hata",
+        description: "Kullanıcı durumu güncellenemedi: " + error.message,
+        variant: "destructive",
       });
     } finally {
       setUpdatingUser(null);
@@ -50,30 +73,32 @@ export const useAdminActions = ({
 
   const handleRefreshUsers = async () => {
     setIsRefreshing(true);
-    await refetch('users');
+    await refetch("users");
     setIsRefreshing(false);
   };
 
   const handleUpdateUserRole = async (userId, newRole) => {
     setUpdatingUser(userId);
     try {
-      const { error } = await supabase.rpc('update_user_role', {
+      const { error } = await supabase.rpc("update_user_role", {
         p_user_id: userId,
-        p_new_role: newRole
+        p_new_role: newRole,
       });
 
       if (error) throw error;
 
-      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      setUsers(
+        users.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+      );
       toast({
-        title: 'Başarılı!',
-        description: 'Kullanıcı rolü güncellendi.',
+        title: "Başarılı!",
+        description: "Kullanıcı rolü güncellendi.",
       });
     } catch (error) {
       toast({
-        title: 'Hata',
-        description: 'Kullanıcı rolü güncellenemedi: ' + error.message,
-        variant: 'destructive',
+        title: "Hata",
+        description: "Kullanıcı rolü güncellenemedi: " + error.message,
+        variant: "destructive",
       });
     } finally {
       setUpdatingUser(null);
@@ -83,20 +108,22 @@ export const useAdminActions = ({
   const handleDeleteUser = async (userId) => {
     setUpdatingUser(userId);
     try {
-      const { data, error } = await supabase.rpc('delete_user_by_id', { user_id_to_delete: userId });
+      const { data, error } = await supabase.rpc("delete_user_by_id", {
+        user_id_to_delete: userId,
+      });
       if (error) throw new Error(error.message);
       if (!data.success) throw new Error(data.message);
 
-      setUsers(users.filter(u => u.id !== userId));
+      setUsers(users.filter((u) => u.id !== userId));
       toast({
-        title: 'Başarılı!',
-        description: 'Kullanıcı başarıyla silindi.',
+        title: "Başarılı!",
+        description: "Kullanıcı başarıyla silindi.",
       });
     } catch (error) {
       toast({
-        title: 'Hata',
-        description: 'Kullanıcı silinemedi: ' + error.message,
-        variant: 'destructive',
+        title: "Hata",
+        description: "Kullanıcı silinemedi: " + error.message,
+        variant: "destructive",
       });
     } finally {
       setUpdatingUser(null);
@@ -108,7 +135,9 @@ export const useAdminActions = ({
   };
 
   const handleStoryUpdated = (updatedStory) => {
-    setStories(stories.map(s => s.id === updatedStory.id ? updatedStory : s));
+    setStories(
+      stories.map((s) => (s.id === updatedStory.id ? updatedStory : s))
+    );
   };
 
   const handleEditStory = (story) => {
@@ -117,45 +146,64 @@ export const useAdminActions = ({
       title: story.title,
       description: story.description,
       level: story.level,
-      category: story.category || 'adventure',
+      category: story.category || "adventure",
       read_time: story.read_time,
       image_url: story.image_url,
       content: story.content,
+    });
+    window.scrollTo({
+      top: 400,
+      behavior: "smooth", // Optional: for smooth scrolling animation
     });
   };
 
   const handleDeleteStory = async (storyId) => {
     try {
-      const { error } = await supabase.from('stories').delete().eq('id', storyId);
+      const { error } = await supabase
+        .from("stories")
+        .delete()
+        .eq("id", storyId);
       if (error) throw error;
-      setStories(stories.filter(s => s.id !== storyId));
+      setStories(stories.filter((s) => s.id !== storyId));
       toast({
-        title: 'Başarılı!',
-        description: 'Hikaye silindi.',
+        title: "Başarılı!",
+        description: "Hikaye silindi.",
       });
     } catch (error) {
       toast({
-        title: 'Hata',
-        description: 'Hikaye silinemedi: ' + error.message,
-        variant: 'destructive',
+        title: "Hata",
+        description: "Hikaye silinemedi: " + error.message,
+        variant: "destructive",
       });
     }
   };
 
   const handleAddTestimonial = async () => {
     if (!testimonialForm.name || !testimonialForm.comment) {
-      toast({ title: 'Hata', description: 'İsim ve yorum alanları zorunludur.', variant: 'destructive' });
+      toast({
+        title: "Hata",
+        description: "İsim ve yorum alanları zorunludur.",
+        variant: "destructive",
+      });
       return;
     }
     setIsProcessingTestimonial(true);
     try {
-      const { data, error } = await supabase.from('testimonials').insert(testimonialForm).select().single();
+      const { data, error } = await supabase
+        .from("testimonials")
+        .insert(testimonialForm)
+        .select()
+        .single();
       if (error) throw error;
       setTestimonials([data, ...testimonials]);
-      setTestimonialForm({ name: '', comment: '' });
-      toast({ title: 'Başarılı!', description: 'Yorum eklendi.' });
+      setTestimonialForm({ name: "", comment: "" });
+      toast({ title: "Başarılı!", description: "Yorum eklendi." });
     } catch (error) {
-      toast({ title: 'Hata', description: 'Yorum eklenemedi: ' + error.message, variant: 'destructive' });
+      toast({
+        title: "Hata",
+        description: "Yorum eklenemedi: " + error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsProcessingTestimonial(false);
     }
@@ -163,73 +211,120 @@ export const useAdminActions = ({
 
   const handleDeleteTestimonial = async (id) => {
     try {
-      const { error } = await supabase.from('testimonials').delete().eq('id', id);
+      const { error } = await supabase
+        .from("testimonials")
+        .delete()
+        .eq("id", id);
       if (error) throw error;
-      setTestimonials(testimonials.filter(t => t.id !== id));
-      toast({ title: 'Başarılı!', description: 'Yorum silindi.' });
+      setTestimonials(testimonials.filter((t) => t.id !== id));
+      toast({ title: "Başarılı!", description: "Yorum silindi." });
     } catch (error) {
-      toast({ title: 'Hata', description: 'Yorum silinemedi: ' + error.message, variant: 'destructive' });
+      toast({
+        title: "Hata",
+        description: "Yorum silinemedi: " + error.message,
+        variant: "destructive",
+      });
     }
   };
 
-  const handleAddLesson = useCallback((newLesson) => {
-    setLessons(prev => [...prev, newLesson].sort((a, b) => a.position - b.position));
-  }, [setLessons]);
+  const handleAddLesson = useCallback(
+    (newLesson) => {
+      setLessons((prev) =>
+        [...prev, newLesson].sort((a, b) => a.position - b.position)
+      );
+    },
+    [setLessons]
+  );
 
-  const handleUpdateLesson = useCallback((updatedLesson) => {
-    setLessons(prev => prev.map(l => l.id === updatedLesson.id ? updatedLesson : l));
-  }, [setLessons]);
+  const handleUpdateLesson = useCallback(
+    (updatedLesson) => {
+      setLessons((prev) =>
+        prev.map((l) => (l.id === updatedLesson.id ? updatedLesson : l))
+      );
+    },
+    [setLessons]
+  );
 
-  const handleDeleteLesson = useCallback(async (lessonId) => {
-    const { error } = await supabase.from('lessons').delete().eq('id', lessonId);
-    if (error) throw error;
-    setLessons(prev => prev.filter(l => l.id !== lessonId));
-    toast({ title: 'Başarılı!', description: 'Ders silindi.' });
-  }, [setLessons, toast]);
+  const handleDeleteLesson = useCallback(
+    async (lessonId) => {
+      const { error } = await supabase
+        .from("lessons")
+        .delete()
+        .eq("id", lessonId);
+      if (error) throw error;
+      setLessons((prev) => prev.filter((l) => l.id !== lessonId));
+      toast({ title: "Başarılı!", description: "Ders silindi." });
+    },
+    [setLessons, toast]
+  );
 
-  const handleCategoryAdded = useCallback((newCategory) => {
-    setCategories(prev => [...prev, newCategory]);
-  }, [setCategories]);
+  const handleCategoryAdded = useCallback(
+    (newCategory) => {
+      setCategories((prev) => [...prev, newCategory]);
+    },
+    [setCategories]
+  );
 
-  const handleUpdateLessonOrder = useCallback(async (orderedLessons) => {
-    const updates = orderedLessons.map((lesson, index) => {
-      const fullLesson = lessons.find(l => l.id === lesson.id);
-      if (!fullLesson || !fullLesson.title || !fullLesson.level || !fullLesson.video_id) {
+  const handleUpdateLessonOrder = useCallback(
+    async (orderedLessons) => {
+      const updates = orderedLessons
+        .map((lesson, index) => {
+          const fullLesson = lessons.find((l) => l.id === lesson.id);
+          if (
+            !fullLesson ||
+            !fullLesson.title ||
+            !fullLesson.level ||
+            !fullLesson.video_id
+          ) {
+            toast({
+              title: "Doğrulama Hatası",
+              description: `"${
+                lesson.title || "İsimsiz"
+              }" dersinde eksik bilgi var. Lütfen dersi kontrol edip tekrar deneyin.`,
+              variant: "destructive",
+            });
+            return null;
+          }
+          return {
+            ...fullLesson,
+            position: index,
+          };
+        })
+        .filter(Boolean);
+
+      if (updates.length !== orderedLessons.length) {
+        refetch("lessons");
+        return;
+      }
+
+      try {
+        const { error } = await supabase.from("lessons").upsert(updates);
+
+        if (error) {
+          throw error;
+        }
+
+        const sortedLessons = [...updates].sort(
+          (a, b) => a.position - b.position
+        );
+        setLessons(sortedLessons);
+
         toast({
-          title: 'Doğrulama Hatası',
-          description: `"${lesson.title || 'İsimsiz'}" dersinde eksik bilgi var. Lütfen dersi kontrol edip tekrar deneyin.`,
-          variant: 'destructive',
+          title: "Başarılı!",
+          description: "Ders sıralaması güncellendi.",
         });
-        return null;
+      } catch (error) {
+        console.error("Error updating lesson order:", error);
+        toast({
+          title: "Hata",
+          description: "Ders sıralaması güncellenemedi: " + error.message,
+          variant: "destructive",
+        });
+        refetch("lessons");
       }
-      return {
-        ...fullLesson,
-        position: index,
-      };
-    }).filter(Boolean);
-
-    if (updates.length !== orderedLessons.length) {
-      refetch('lessons');
-      return;
-    }
-  
-    try {
-      const { error } = await supabase.from('lessons').upsert(updates);
-  
-      if (error) {
-        throw error;
-      }
-      
-      const sortedLessons = [...updates].sort((a, b) => a.position - b.position);
-      setLessons(sortedLessons);
-  
-      toast({ title: 'Başarılı!', description: 'Ders sıralaması güncellendi.' });
-    } catch (error) {
-      console.error('Error updating lesson order:', error);
-      toast({ title: 'Hata', description: 'Ders sıralaması güncellenemedi: ' + error.message, variant: 'destructive' });
-      refetch('lessons');
-    }
-  }, [lessons, setLessons, toast, refetch]);
+    },
+    [lessons, setLessons, toast, refetch]
+  );
 
   return {
     updatingUser,
